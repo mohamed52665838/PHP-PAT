@@ -8,8 +8,8 @@ class ProduitsController {
         $this->pdo = config::getConnexion(); // on récupère directement la connexion
     }
 public function getProduits() {
-    
-    $listeProduits = $this->pdo->prepare('SELECT * FROM produits');
+    $requetSql = 'SELECT * FROM produits';
+    $listeProduits = $this->pdo->prepare( $requetSql);
     $listeProduits->execute();
     return $listeProduits->fetchAll(PDO::FETCH_ASSOC);
 }
