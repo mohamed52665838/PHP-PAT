@@ -10,8 +10,8 @@ class User {
     private $role = "client";
     
 
-    public function __construct($id,$nom, $prenom, $password, $role,$email) {
-        $this->id = $id;
+    public function __construct($nom, $prenom, $password, $role,$email) {
+       
         $this->nom = $nom;
         $this->prenom = $prenom;
         $this->password = $password;
@@ -19,9 +19,7 @@ class User {
         $this->email = $email;
     }
 
-    public function getId() {
-        return $this->id;
-    }
+   
     //getters
     public function getNom() {
         return $this->nom;

@@ -24,7 +24,7 @@ class Produit {
 
     public function getDescription() {
         return $this->description;
-    }
+    } 
 
     public function getPrix() {
         return $this->prix;
