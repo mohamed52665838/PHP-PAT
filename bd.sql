@@ -47,3 +47,4 @@ CREATE TABLE commande_produit(
     FOREIGN KEY (produit_id) REFERENCES produits(id) ON DELETE CASCADE
 );
 
+

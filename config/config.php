@@ -1,7 +1,7 @@
 <?php
 
 class config {
-  private static $pdo = NULL;
+  private static $pdo = NULL;//instance unique 
 
   public static function getConnexion() {
     if (!isset(self::$pdo)) {
