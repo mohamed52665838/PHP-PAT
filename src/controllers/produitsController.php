@@ -129,7 +129,7 @@ class ProduitsController {
         try {
             $query = $this->pdo->prepare($sql);
             $query->execute(['nom' => "%$nom%"]);
-            return $query->fetch();
+            return  $query->fetchAll(PDO::FETCH_ASSOC); 
         } catch (Exception $e) {
             die('Error: ' . $e->getMessage());
         }

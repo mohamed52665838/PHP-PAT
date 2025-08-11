@@ -26,25 +26,36 @@ CREATE TABLE produits(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE commandes(
+CREATE TABLE panier (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    prixFinaleDeProduit DECIMAL(10, 2) NOT NULL,
+    active BOOLEAN DEFAULT FALSE,
     user_id INT NOT NULL,
     status ENUM('en attente', 'en cours', 'livrée', 'annulée') NOT NULL DEFAULT 'en attente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);  
-
--- CHN3REF BIHA EL COMMANDE IL 5ARJA CHFIHA PRODUITS O UTILISATEUR O N3REF BIHA PROX TOTALE DU COMMANDES
-CREATE TABLE commande_produit(
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    commande_id INT NOT NULL,
-    produit_id INT NOT NULL,
-    prixFinaleDeProduit DECIMAL(10, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (commande_id) REFERENCES commandes(id) ON DELETE CASCADE,
-    FOREIGN KEY (produit_id) REFERENCES produits(id) ON DELETE CASCADE
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE commande_produit (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    panier_id INT NOT NULL,
+    produit_id INT NOT NULL,
+    qte INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY(produit_id) REFERENCES produits(id) ON DELETE CASCADE,
+    FOREIGN KEY(panier_id) REFERENCES panier(id) ON DELETE CASCADE
+);
 
+1 step
+
+we should get the active cart by user id which is from the session
+
+SELECT id as id_panier from panier where user_id = id AND active = true
+
+2 step
+
+now we can get all our orders by matching the id_panier in commande_produit table
+
+select * from commande_produit where id_panier = id_panier

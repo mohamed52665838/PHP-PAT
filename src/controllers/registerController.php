@@ -21,7 +21,7 @@ class RegisterController {
             $email = trim($_POST['email']);
             $password = $_POST['password'];
             $confirmPassword = $_POST['confirm_password'];
-            $role = isset($_POST['role']) ? $_POST['role'] : 'user'; // Default role
+            $role = isset($_POST['role']) ? $_POST['role'] : 'client'; // Default role
             
             // Validation
             $errors = $this->validateInput($nom, $prenom, $email, $password, $confirmPassword, $role);
@@ -91,7 +91,7 @@ class RegisterController {
 
         
         // Role validation
-        $allowedRoles = ['user'];
+        $allowedRoles = ['client'];
         if (!in_array($role, $allowedRoles)) {
             $errors[] = "Invalid role selected";
         }
@@ -113,7 +113,7 @@ class RegisterController {
             'nom' => $_POST['nom'] ?? '',
             'prenom' => $_POST['prenom'] ?? '',
             'email' => $_POST['email'] ?? '',
-            'role' => $_POST['role'] ?? 'user'
+            'role' => $_POST['role'] ?? 'client'
         ]);
         header("Location: ../views/front/register/index.php?" . $params);
         exit();
