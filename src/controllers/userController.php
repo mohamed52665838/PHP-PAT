@@ -21,6 +21,14 @@ class UserController {
         }
     }
 
+    /** Hash le mot de passe seulement si ce n'est pas déjà un hash (évite le double-hash). */
+private function hashIfNeeded(?string $pwd): string {
+    $pwd = (string)$pwd;
+    $info = password_get_info($pwd);   // ['algo'] = 0 si ce n'est PAS un hash
+    return !empty($info['algo']) ? $pwd : password_hash($pwd, PASSWORD_DEFAULT);
+}
+
+
         function add($user)
     {
        
@@ -33,7 +41,7 @@ class UserController {
 
             $query->bindValue(':nom', $user->getNom());
             $query->bindValue(':prenom', $user->getPrenom());
-            $query->bindValue(':password', $user->getPassword());
+            $query->bindValue(':password', $this->hashIfNeeded($user->getPassword()));
             $query->bindValue(':role', $user->getRole());
             $query->bindValue(':email', $user->getEmail());
 
@@ -44,32 +52,48 @@ class UserController {
         }
     }
 
-     function update($user, $id)
-    {
-        try {
-            
-            $query = $this->pdo->prepare('UPDATE users SET 
-                    `nom` = :nom, 
-                    `prenom` = :prenom, 
-                    `password` = :password, 
-                    `role` = :role,
-                    `email` = :email
-                WHERE id = :id'
-            );
-            $query->bindValue(':nom', $user->getNom());
-            $query->bindValue(':prenom', $user->getPrenom());
-            $query->bindValue(':password', $user->getPassword());
-            $query->bindValue(':role', $user->getRole());
-            $query->bindValue(':email', $user->getEmail());
-            $query->bindValue(':id',$id);
+function update($user, $id)
+{
+    try {
+        // 1) Préparer la bonne valeur de password
+        $pwdInput = $user->getPassword();
 
-
-            $query->execute();
-
-        } catch (PDOException $e) {
-            $e->getMessage();
+        if ($pwdInput === null || $pwdInput === '') {
+            // Champ vide => on conserve le hash existant
+            $stmt = $this->pdo->prepare('SELECT password FROM users WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            $pwdHash = (string)$stmt->fetchColumn();
+        } else {
+            // Champ rempli => si déjà un hash, on garde, sinon on hash
+            $info = password_get_info($pwdInput); // ['algo'] = 0 si ce n'est PAS un hash
+            $pwdHash = !empty($info['algo']) ? $pwdInput : password_hash($pwdInput, PASSWORD_DEFAULT);
         }
+
+        // 2) Update
+        $query = $this->pdo->prepare('UPDATE users SET 
+                `nom` = :nom, 
+                `prenom` = :prenom, 
+                `password` = :password, 
+                `role` = :role,
+                `email` = :email
+            WHERE id = :id'
+        );
+
+        $query->bindValue(':nom', $user->getNom());
+        $query->bindValue(':prenom', $user->getPrenom());
+        $query->bindValue(':password', $pwdHash);
+        $query->bindValue(':role', $user->getRole());
+        $query->bindValue(':email', $user->getEmail());
+        $query->bindValue(':id', $id);
+
+        $query->execute();
+
+    } catch (PDOException $e) {
+        echo 'Error: ' . $e->getMessage();
     }
+}
+
+
      public function getUsers()
     {
        

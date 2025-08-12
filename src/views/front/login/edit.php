@@ -9,6 +9,12 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 
+/* ==== AJOUT MINIMAL : déduire le rôle ==== */
+$role    = strtolower($user['role'] ?? '');
+$isAdmin = ($role === 'admin');
+$isPrep  = ($role === 'preparateur');
+/* ======================================== */
+
 // Valeurs à afficher dans le formulaire (en cas de retour avec ?nom=... etc.)
 $formNom    = $_GET['nom']    ?? ($user['nom']    ?? '');
 $formPrenom = $_GET['prenom'] ?? ($user['prenom'] ?? '');
@@ -40,6 +46,7 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
           </div>
           <span class="text-lg font-extrabold tracking-tight text-pink-700">Pâtisserie</span>
         </a>
+
         <div class="hidden md:flex items-center gap-6">
           <a href="../../back/dashboard/index.php" class="text-sm text-gray-700 hover:text-pink-600 transition">
             <i class="fa-solid fa-house-chimney mr-2"></i>Dashboard
@@ -47,10 +54,20 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
           <a href="#" class="text-sm text-gray-700 hover:text-pink-600 transition">
             <i class="fa-solid fa-user-gear mr-2"></i>Profil
           </a>
-          <a href="#" class="text-sm text-gray-700 hover:text-pink-600 transition">
-            <i class="fa-solid fa-receipt mr-2"></i>Commandes
-          </a>
+
+          <!-- ==== AJOUT MINIMAL : Commandes selon rôle (desktop) ==== -->
+          <?php if ($isPrep): ?>
+            <a href="../commandes/commande.php" class="text-sm text-gray-700 hover:text-pink-600 transition">
+              <i class="fa-solid fa-receipt mr-2"></i>Commandes
+            </a>
+          <?php elseif (!$isAdmin): /* client uniquement */ ?>
+            <a href="../historique/order.php" class="text-sm text-gray-700 hover:text-pink-600 transition">
+              <i class="fa-solid fa-receipt mr-2"></i>Commandes
+            </a>
+          <?php endif; ?>
+          <!-- ================================================ -->
         </div>
+
         <div class="hidden md:flex items-center gap-3">
           <span class="text-sm font-semibold text-pink-700">
             Bonjour, <?= htmlspecialchars(strtolower($user['nom'])) ?>
@@ -59,11 +76,13 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
             <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
           </a>
         </div>
+
         <button id="navToggle" class="md:hidden h-9 w-9 rounded-lg ring-1 ring-gray-200 text-gray-700 hover:bg-gray-50">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
     </div>
+
     <div id="navMenu" class="md:hidden hidden border-t border-white/60 bg-white/80 backdrop-blur">
       <div class="px-4 py-3 space-y-2">
         <a href="index.php" class="flex items-center gap-2 text-gray-700 hover:text-pink-600">
@@ -72,9 +91,19 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
         <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-pink-600">
           <i class="fa-solid fa-user-gear"></i><span>Profil</span>
         </a>
-        <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-pink-600">
-          <i class="fa-solid fa-receipt"></i><span>Commandes</span>
-        </a>
+
+        <!-- ==== AJOUT MINIMAL : Commandes selon rôle (mobile) ==== -->
+        <?php if ($isPrep): ?>
+          <a href="../commandes/commande.php" class="flex items-center gap-2 text-gray-700 hover:text-pink-600">
+            <i class="fa-solid fa-receipt"></i><span>Commandes</span>
+          </a>
+        <?php elseif (!$isAdmin): /* client uniquement */ ?>
+          <a href="../historique/order.php" class="flex items-center gap-2 text-gray-700 hover:text-pink-600">
+            <i class="fa-solid fa-receipt"></i><span>Commandes</span>
+          </a>
+        <?php endif; ?>
+        <!-- ================================================ -->
+
         <a href="logout.php" class="flex items-center gap-2 text-pink-700 hover:text-pink-600">
           <i class="fa-solid fa-right-from-bracket"></i><span>Déconnexion</span>
         </a>
@@ -267,9 +296,7 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
     return ok;
   }
 
-  // Mot de passe (optionnel) :
-  // - Si vide → pas d’erreur
-  // - Si rempli → longueur >= 6 et confirmation identique si confirm rempli
+  // Mot de passe (optionnel)
   function validateNewPwd() {
     const v = newPwd.value || '';
     if (!v) { setBorder(newPwd, null); showErr(pwdErr, ''); return true; }
@@ -280,9 +307,9 @@ $formEmail  = $_GET['email']  ?? ($user['email']  ?? '');
   }
   function validateConfirmPwd() {
     const v  = newPwd.value || '';
-    const v2 = cPwd.value || '';
-    if (!v2) { setBorder(cPwd, null); showErr(matchErr, ''); return true; }
-    const ok = v !== '' && v === v2;
+    toMatch = cPwd.value || '';
+    if (!toMatch) { setBorder(cPwd, null); showErr(matchErr, ''); return true; }
+    const ok = v !== '' && v === toMatch;
     setBorder(cPwd, ok ? 'green' : 'red');
     showErr(matchErr, ok ? '' : 'Les mots de passe ne correspondent pas.');
     return ok;
