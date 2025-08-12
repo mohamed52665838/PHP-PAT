@@ -178,10 +178,10 @@ $chartRoles = [
         <p class="text-sm text-gray-500">Stock bas (&lt; 10)</p>
         <p class="mt-2 text-2xl font-semibold text-rose-600"><?= number_format($kpis['stockLow']) ?></p>
       </div>
-      <div class="rounded-2xl bg-white/80 backdrop-blur p-5 shadow border border-white">
+      <!-- <div class="rounded-2xl bg-white/80 backdrop-blur p-5 shadow border border-white">
         <p class="text-sm text-gray-500">Commande</p>
         <p class="mt-2 text-2xl font-semibold"><?= number_format($kpis['orders']) ?></p>
-      </div>
+      </div> -->
     </section>
 
     <!-- Graphique + Raccourcis -->

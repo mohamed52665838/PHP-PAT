@@ -71,7 +71,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'update') {
   .animate-slide{animation:slide 8s linear infinite}
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-red-50 via-rose-300 to-red-200 text-gray-800">
+<body class="min-h-screen bg-pink-100 from-red-50 via-rose-300 to-red-200 text-gray-800">
 <?php if (isset($_GET['status'])): ?>
   <div id="flash" class="mx-auto max-w-3xl my-4">
     <?php if ($_GET['status'] === 'updated'): ?>
@@ -122,7 +122,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'update') {
     <?php endif; ?>
 
     <!-- Formulaire -->
-    <div class="text-gray-800 rounded-2xl border border-red-200 bg-pink-600 backdrop-blur shadow-sm p-6">
+    <div class="text-gray-800 rounded-2xl border border-red-200 bg-pink-300 backdrop-blur shadow-sm p-6">
       <?php if ($userAModifier): ?>
         <!-- ====== UPDATE ====== -->
         <form method="post" class="space-y-5" id="formUpdate" novalidate>
